@@ -1,6 +1,6 @@
 # Repository specification: aether-ai-api
 
-**Status:** Documentation baseline copied from the Aether AI master specification. Implementation status must be verified separately.
+**Status:** Repository exists; documentation-only on the inspected `main` branch. No application implementation is present in the audited tree.
 
 ## Mission
 
@@ -12,7 +12,7 @@ Owns product API, authentication integration and per-resource authorization enfo
 
 ## Dependencies and connections
 
-aether-ai-auth, aether-ai-gateway (bounded synchronous model requests), aether-ai-orchestration (durable runs), aether-ai-files, aether-ai-knowledge public contracts, aether-ai-billing entitlement contract, aether-ai-security policy contract, aether-ai-observability. Do not depend directly on the agent runtime for durable execution.
+aether-ai-auth, aether-ai-gateway, aether-ai-orchestration, aether-ai-files, aether-ai-knowledge, aether-ai-billing, aether-ai-security, and aether-ai-observability.
 
 ## Execution routing contract
 
