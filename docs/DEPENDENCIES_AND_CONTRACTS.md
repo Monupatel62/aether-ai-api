@@ -8,11 +8,11 @@ Product REST API/OpenAPI and internal service contracts
 
 ## Direct dependencies
 
-auth, gateway, agents, files, database, billing, observability.
+auth; gateway for bounded synchronous model requests; orchestration for durable agent runs; files; knowledge; billing entitlement contract; security policy contract; observability. Use only public database/domain contracts where explicitly required; do not import database implementation internals or call agents directly for durable runs.
 
 ## Required rules
 
-Define auth context, tenant scope, rate limits, request size, idempotency keys, stable error schema, API versioning, and OpenAPI compatibility tests.
+Define auth context, trusted tenant resolution, per-resource authorization, rate limits, request size, idempotency keys, stable error schema, API versioning and OpenAPI compatibility tests. Durable runs flow API → orchestration → agents; API must not bypass orchestration for durable execution. Any direct gateway request must be bounded and documented separately.
 
 ## Contract governance
 
