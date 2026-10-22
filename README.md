@@ -12,7 +12,7 @@ Product API/BFF; validates identity and permissions and delegates domain work.
 
 ## Dependencies
 
-aether-ai-auth, aether-ai-gateway, aether-ai-agents, aether-ai-files, aether-ai-database, aether-ai-observability.
+aether-ai-auth, aether-ai-gateway, aether-ai-orchestration, aether-ai-files, aether-ai-knowledge, aether-ai-billing, aether-ai-security, and aether-ai-observability.
 
 ## Project rules
 
