@@ -1,0 +1,79 @@
+# Repository specification: aether-ai-api
+
+**Status:** Documentation baseline copied from the Aether AI master specification. Implementation status must be verified separately.
+
+## Mission
+
+Authenticated product API/BFF for users, conversations, run submission/status, files, knowledge, usage, and admin operations.
+
+## Responsibility boundary
+
+Owns product API, authentication integration and per-resource authorization enforcement; delegates bounded model requests to gateway and durable/long-running runs to orchestration.
+
+## Dependencies and connections
+
+aether-ai-auth, aether-ai-gateway (bounded synchronous model requests), aether-ai-orchestration (durable runs), aether-ai-files, aether-ai-knowledge public contracts, aether-ai-billing entitlement contract, aether-ai-security policy contract, aether-ai-observability. Do not depend directly on the agent runtime for durable execution.
+
+## Execution routing contract
+
+- Durable/long-running run submission, status, cancellation and recovery go through the orchestration public contract; orchestration is the sole owner of durable run/step state.
+- Bounded synchronous completion may call the gateway directly when it does not create a second durable run lifecycle.
+- API authorizes each requested resource/action using the shared security policy contract. Authentication alone is never treated as authorization.
+- Do not import another domain's private persistence schema; use its public API/contract.
+
+## Owned capabilities
+
+OpenAPI, request validation, auth/tenant checks, rate limits, idempotency, stable error codes, API versioning.
+
+## Must not own
+
+- Responsibilities explicitly assigned to another repository in the master catalog.
+- Product UI, provider secrets, or privileged actions outside this repository's boundary.
+- Unreviewed direct database access into another component's private schema.
+- Unversioned cross-repository APIs or hidden side effects.
+
+## Required public contracts
+
+- A typed/versioned interface with documented inputs, outputs, error cases, limits, and compatibility policy.
+- Explicit auth/tenant context where data or actions are user-scoped.
+- Correlation/run identifiers and structured, redacted lifecycle events.
+- Timeouts, retry behavior, cancellation, idempotency, and partial-failure semantics where applicable.
+
+## Security and privacy
+
+- Treat model output, external APIs, uploaded content, workflow definitions, and MCP responses as untrusted.
+- Enforce least privilege and tenant isolation at every data/tool boundary.
+- Keep credentials server-side and use the approved secret mechanism; never log tokens or raw secrets.
+- Define retention, deletion, payload limits, and redaction before persisting prompts, files, or run results.
+
+## Test plan
+
+- Unit tests for domain rules and input validation.
+- Contract tests for every direct upstream dependency.
+- Negative tests for unauthorized access, malformed inputs, excessive payloads, and missing capabilities.
+- Failure tests for timeouts, dependency outages, retries, duplicate requests, and cancellation.
+- Integration/smoke test in a non-production environment before release.
+
+## Implementation gates
+
+1. Finish documentation and resolve open ADRs.
+2. Pin and license-check every dependency and selected upstream version.
+3. Implement a minimum vertical slice only within this repository's boundary.
+4. Add tests, observability, security checks, and operational instructions with the implementation.
+5. Update this specification and the master catalog in the same change when contracts or ownership change.
+
+## Related documentation
+
+- [Master catalog](../REPOSITORY_CATALOG.md)
+- [Architecture](../MASTER_ARCHITECTURE.md)
+- [Implementation roadmap](../IMPLEMENTATION_ROADMAP.md)
+- [Decision log](../DECISION_LOG.md)
+
+## Research references
+
+- [WoHo AI DevKit](https://github.com/Monupatel62/woho-ai-devkit) — separate project; verify package APIs/version before integration.
+- [AI DIAL Core](https://github.com/epam/ai-dial-core) — model gateway reference; repository includes Apache-2.0 LICENSE.
+- [AI DIAL Chat](https://github.com/epam/ai-dial-chat) — modular UI/BFF reference; check file-level license notices before reuse.
+- [AI DIAL documentation](https://github.com/epam/ai-dial) and [MCP specification](https://modelcontextprotocol.io/) where relevant.
+
+These are design references, not a statement that their code has been copied or that all components share one license.
