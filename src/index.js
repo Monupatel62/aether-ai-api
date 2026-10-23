@@ -80,8 +80,16 @@ export function createApiServer({ authenticate, gateway, maxBodyBytes = DEFAULT_
         const [status, code, message] = mapping[error.code] ?? [400, "invalid_request", "Invalid request"];
         return sendJson(response, status, { error: { code, message } }, requestId);
       }
-      if (!isRecord(input) || typeof input.model !== "string" || !Array.isArray(input.messages) || input.messages.length === 0) {
-        return sendJson(response, 400, { error: { code: "invalid_request", message: "model and non-empty messages are required" } }, requestId);
+      if (!isRecord(input) || typeof input.model !== "string" || !input.model.trim() || input.model.length > 200 || !Array.isArray(input.messages) || input.messages.length === 0 || input.messages.length > 100) {
+        return sendJson(response, 400, { error: { code: "invalid_request", message: "A valid model and between 1 and 100 messages are required" } }, requestId);
+      }
+      const validRoles = new Set(["system", "developer", "user", "assistant"]);
+      const invalidMessage = input.messages.some((message) => !isRecord(message)
+        || !validRoles.has(message.role)
+        || typeof message.content !== "string"
+        || message.content.length > 100_000);
+      if (invalidMessage) {
+        return sendJson(response, 400, { error: { code: "invalid_request", message: "Each message must have a supported role and text content within the configured limit" } }, requestId);
       }
       if (input.stream === true) {
         return sendJson(response, 501, { error: { code: "streaming_not_implemented", message: "Streaming is not enabled on this endpoint yet" } }, requestId);
