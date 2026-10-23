@@ -4,17 +4,26 @@
 
 ## Role in the system
 
-Owns product-level request validation, authorization enforcement, and API versioning; delegates model and job execution.
+Owns product-level request validation, authorization enforcement, and API versioning; delegates model and durable job execution to the appropriate contract owner.
 
 ## Dependencies
 
-aether-ai-auth, aether-ai-gateway, aether-ai-agents, aether-ai-files, aether-ai-database, aether-ai-observability.
+- `aether-ai-auth`: principal/session and authentication contract.
+- `aether-ai-gateway`: bounded synchronous model requests only.
+- `aether-ai-orchestration`: durable run create/status/cancel/approval operations.
+- `aether-ai-files` and `aether-ai-knowledge`: scoped data through public contracts.
+- `aether-ai-billing`: read-only entitlement/plan contract; trusted usage events are emitted asynchronously.
+- `aether-ai-security`: policy request/decision contract.
+- `aether-ai-observability`: redacted telemetry.
+- Generated/public database/domain contracts only where explicitly required; no private-table access or dependency on database implementation internals.
+
+The API MUST NOT depend directly on `aether-ai-agents` for durable execution. Orchestration owns durable run state and invokes Agents. Direct API → Gateway calls are a separate bounded synchronous path.
 
 ## Data and control flow
 
 1. A user or upstream service initiates an operation through an authenticated, documented boundary.
 2. This component validates shape, scope, limits, and required permissions before work begins.
-3. It delegates provider-, storage-, identity-, or execution-specific work to the named dependency rather than copying that responsibility.
+3. It delegates provider-, storage-, identity-, or durable-execution-specific work to the named contract owner rather than copying that responsibility.
 4. It emits a correlation/run identifier and structured lifecycle events with sensitive fields redacted.
 5. It returns a stable result/error contract; partial, cancelled, timed-out, and retried outcomes are distinguishable.
 
