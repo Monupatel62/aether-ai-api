@@ -79,3 +79,15 @@ test("validates upstream timeout and response size configuration", () => {
   assert.throws(() => createApiServer({ authenticate: async () => null, gateway: { complete: async () => ({ text: "" }) }, upstreamTimeoutMs: 0 }), /upstreamTimeoutMs/);
   assert.throws(() => createApiServer({ authenticate: async () => null, gateway: { complete: async () => ({ text: "" }) }, maxResponseTextChars: 0 }), /maxResponseTextChars/);
 });
+
+
+test("validates message roles, content types, and bounded message counts", async () => {
+  const options = { authenticate: async () => ({ id: "user-1", tenantId: "tenant-a" }), gateway: { complete: async () => ({ text: "ok" }) } };
+  await withServer(options, async (base) => {
+    const post = (body) => fetch(`${base}/v1/chat/completions`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    assert.equal((await post({ model: "m", messages: [{ role: "system", content: { unsafe: true } }] })).status, 400);
+    assert.equal((await post({ model: "m", messages: [{ role: "unknown", content: "x" }] })).status, 400);
+    assert.equal((await post({ model: "m", messages: Array.from({ length: 101 }, () => ({ role: "user", content: "x" })) })).status, 400);
+    assert.equal((await post({ model: " ", messages: [{ role: "user", content: "x" }] })).status, 400);
+  });
+});
