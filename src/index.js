@@ -83,7 +83,7 @@ export function createApiServer({ authenticate, gateway, maxBodyBytes = DEFAULT_
       if (!isRecord(input) || typeof input.model !== "string" || !input.model.trim() || input.model.length > 200 || !Array.isArray(input.messages) || input.messages.length === 0 || input.messages.length > 100) {
         return sendJson(response, 400, { error: { code: "invalid_request", message: "A valid model and between 1 and 100 messages are required" } }, requestId);
       }
-      const validRoles = new Set(["system", "developer", "user", "assistant"]);
+      const validRoles = new Set(["system", "user", "assistant", "tool"]);
       const invalidMessage = input.messages.some((message) => !isRecord(message)
         || !validRoles.has(message.role)
         || typeof message.content !== "string"
