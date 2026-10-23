@@ -23,7 +23,7 @@ export function createApiError({ code, message, status, retryable = false, detai
   if (typeof message !== "string" || !message.trim() || message.length > 500) throw new TypeError("message must be a non-empty string of at most 500 characters");
   if (!Number.isInteger(status) || status < 400 || status > 599) throw new TypeError("status must be an HTTP error status");
   const safeDetails = details && typeof details === "object" && !Array.isArray(details)
-    ? Object.fromEntries(Object.entries(details).filter(([key, value]) => /^[a-zA-Z][a-zA-Z0-9_]{0,63}$/.test(key) && ["string", "number", "boolean"].includes(typeof value)).slice(0, 20))
+    ? Object.fromEntries(Object.entries(details).filter(([key, value]) => /^[a-zA-Z][a-zA-Z0-9_]{0,63}$/.test(key) && !/(token|secret|password|authorization|cookie|credential|api.?key)/i.test(key) && ["string", "number", "boolean"].includes(typeof value)).slice(0, 20))
     : undefined;
   return Object.freeze({
     contractVersion: API_CONTRACT_VERSION,
