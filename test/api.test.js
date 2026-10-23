@@ -59,3 +59,23 @@ test("returns safe generic error when gateway fails", async () => {
     assert.equal(JSON.stringify(body).includes("secret prompt"), false);
   });
 });
+
+
+test("bounds a hanging upstream and rejects malformed upstream responses", async () => {
+  const auth = async () => ({ id: "user-1", tenantId: "tenant-a" });
+  await withServer({ authenticate: auth, gateway: { complete: () => new Promise(() => {}) }, upstreamTimeoutMs: 10 }, async (base) => {
+    const response = await fetch(`${base}/v1/chat/completions`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
+    assert.equal(response.status, 504);
+    assert.equal((await response.json()).error.code, "upstream_timeout");
+  });
+  await withServer({ authenticate: auth, gateway: { complete: async () => ({ text: 42 }) } }, async (base) => {
+    const response = await fetch(`${base}/v1/chat/completions`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
+    assert.equal(response.status, 502);
+    assert.equal((await response.json()).error.code, "upstream_failure");
+  });
+});
+
+test("validates upstream timeout and response size configuration", () => {
+  assert.throws(() => createApiServer({ authenticate: async () => null, gateway: { complete: async () => ({ text: "" }) }, upstreamTimeoutMs: 0 }), /upstreamTimeoutMs/);
+  assert.throws(() => createApiServer({ authenticate: async () => null, gateway: { complete: async () => ({ text: "" }) }, maxResponseTextChars: 0 }), /maxResponseTextChars/);
+});
