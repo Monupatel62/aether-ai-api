@@ -12,7 +12,13 @@ Proposed domains: auth context, conversations, model catalog, completions, agent
 
 ## Connections and ownership
 
-API -> auth for identity primitives; API -> gateway for direct model calls; API -> orchestration/agents for run creation/status; API -> files/knowledge for scoped data; usage events -> billing; all requests -> observability with redaction.
+- API → Auth for identity primitives and principal/session context.
+- API → Gateway for bounded synchronous model requests only; document streaming, timeout and cancellation separately.
+- API → Orchestration for durable run creation, status, cancellation and approvals. Orchestration owns durable run/step state and invokes Agents through the versioned agent contract.
+- API MUST NOT call Agents directly to create, advance, recover, or manage durable runs; doing so would bypass orchestration's state machine, queue delivery, idempotency and recovery rules.
+- API → Files/Knowledge for scoped data through their public contracts.
+- Trusted usage events flow asynchronously to Billing; API may consume the approved read-only entitlement contract but must not write billing tables.
+- All requests emit redacted telemetry through Observability.
 
 ## Failure cases to design explicitly
 
@@ -24,7 +30,7 @@ API -> auth for identity primitives; API -> gateway for direct model calls; API 
 
 ## Verification plan
 
-Contract tests for OpenAPI, tenant isolation, permission denials, payload/rate limits, idempotent run creation, streaming disconnect/cancel, stable error codes, and dependency outage behavior.
+Contract tests for OpenAPI, tenant isolation, permission denials, payload/rate limits, idempotent run creation, streaming disconnect/cancel, stable error codes, and dependency outage behavior. Durable-run tests must verify the API delegates through Orchestration and cannot bypass it.
 
 ## Open decisions
 
