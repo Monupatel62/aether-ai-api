@@ -1,6 +1,6 @@
 # aether-ai-api
 
-> **Status: Documentation phase.** No application code or production deployment has been started in this repository.
+> **Status: Initial API error/request-metadata contracts in review.** No product routes, authentication middleware, domain orchestration, or production deployment are implemented.
 
 ## Purpose
 
@@ -33,6 +33,10 @@ aether-ai-auth, aether-ai-gateway, aether-ai-orchestration, aether-ai-files, aet
 - [Work log and decisions](docs/WORKLOG.md)
 - [Master 33-repository catalog](https://github.com/Monupatel62/aether-ai-platform/blob/main/docs/REPOSITORY_CATALOG.md)
 - [Continuity handoff for new chats](https://github.com/Monupatel62/aether-ai-platform/blob/main/docs/WORK_HANDOFF.md)
+
+## Initial implementation
+
+The draft `@aether-ai/api` package provides stable public error codes/messages, HTTP status mapping, retryability metadata, and bounded request/correlation ID validation. It intentionally rejects arbitrary error messages to reduce upstream data leakage. It does not authenticate users, authorize tenants/resources, implement routes, or orchestrate domain services; those remain mandatory and are not replaced by these helpers.
 
 ## Before coding
 
