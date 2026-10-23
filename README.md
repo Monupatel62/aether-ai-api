@@ -4,15 +4,15 @@
 
 ## Implemented
 
-- [HTTP API source](src/index.js): `GET /health/live`, authenticated `POST /v1/chat/completions`, bounded JSON body, request IDs, generic safe errors, and request/header timeouts.
-- [API tests](test/api.test.js): auth rejection, malformed principal, successful gateway call, invalid content type/JSON, oversized payload, unsupported streaming, and safe upstream failure.
+- [HTTP API source](src/index.js): `GET /health/live`, authenticated `POST /v1/chat/completions`, bounded JSON body and text messages, request IDs, generic safe errors, upstream timeout/cancellation signal, response-size limits, and request/header timeouts.
+- [API tests](test/api.test.js): auth rejection, malformed principal, successful gateway call, role/content/count validation, invalid content type/JSON, oversized payload, unsupported streaming, upstream timeout, malformed upstream result, and safe upstream failure.
 - Dependency-free Node.js package with Node 20/22 CI.
 
 ## Security and limitations
 
 - The `authenticate` callback must verify credentials and resolve the principal from a trusted server-side source; the request body cannot provide the principal.
 - The injected gateway must perform resource/model authorization and provider routing.
-- Streaming deliberately returns `501` until a real streaming contract is implemented.
+- Streaming deliberately returns `501` until a real streaming contract is implemented. Message roles are aligned with the current provider contract (`system`, `user`, `assistant`, `tool`); text-only content is accepted by this baseline.
 - No identity provider, persistent storage, rate limiter, billing integration, OpenAPI validator, CORS policy, or production deployment has been selected or integrated.
 - Do not expose publicly until auth verification, policy enforcement, rate limits, telemetry redaction, and integration/security tests are complete.
 
