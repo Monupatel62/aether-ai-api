@@ -1,0 +1,17 @@
+{
+  "name": "@aether-ai/api-contract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Versioned Aether AI product API contracts and request validation",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/index.js && node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
